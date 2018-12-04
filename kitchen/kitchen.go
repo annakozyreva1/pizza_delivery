@@ -32,6 +32,6 @@ func (k *Kitchen) Cook(orders []order.Order) []CookedOrder {
 
 func NewKitchen(ovenCount int) *Kitchen {
 	return &Kitchen{
-		ovensFreeTimes: make([]int, ovenCount, ovenCount),
+		ovensFreeTimes: make([]int, ovenCount),
 	}
 }
