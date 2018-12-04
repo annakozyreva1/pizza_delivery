@@ -74,7 +74,7 @@ func (d *Delivery) calcFitRoute(cookedOrders kitchen.CookedOrders) (bool, Route)
 		for i := 0; i < cookedOrderCount; i++ {                //проходим по всем остальным заказам
 			if !rawRoute.IsAddedOrder(i) { //если по этому заказу не проходили в этой цепочке и не текущий заказ
 				duration := deliveryDuration[current][i] //берем период доставки от текущего заказа до следующего
-				if currentDuration+duration < maxDeliveryTime[i] { //если период доставки подходит
+				if currentDuration+duration <= maxDeliveryTime[i] { //если период доставки подходит
 					nextRawRoute := rawRoute.Copy()
 					nextRawRoute.AddOrder(i, duration) //добавляем заказ в цепочку
 					_, duration, length := nextRawRoute.GetLastOrder()
