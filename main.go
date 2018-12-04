@@ -10,13 +10,17 @@ import (
 
 var orderCount = flag.Int("count", 100, "generated order count")
 
+const (
+	OvenCount = 2
+)
+
 func main() {
 	flag.Parse()
 	orders := order.GenerateOrders(*orderCount)
 	for i, order := range orders {
 		fmt.Printf("%v %v %v %v %v\n", i, order.Time, order.CookingDuration, order.DeliveryPoint.X, order.DeliveryPoint.Y)
 	}
-	kitchen := kitchen.NewKitchen(2)
+	kitchen := kitchen.NewKitchen(OvenCount)
 	cookedOrders := kitchen.Cook(orders)
 	delivery := delivery.NewDelivery(orders, cookedOrders)
 	routes := delivery.CreateRoutes()
