@@ -50,7 +50,7 @@ func (d *Delivery) calcStartRawRoutes(cookedOrders kitchen.CookedOrders, maxDeli
 	routes := make([]rawRoute, 0)
 	for i, cookedOrder := range cookedOrders {
 		deliveryDuration := getDistance(order.Point{}, d.orders[cookedOrder.Number].DeliveryPoint) / DeliverySpeed
-		if deliveryDuration < maxDeliveryTime[i] {
+		if deliveryDuration <= maxDeliveryTime[i] {
 			r := createRawRoute(len(cookedOrders))
 			r.AddOrder(i, deliveryDuration)
 			routes = append(routes, r)
