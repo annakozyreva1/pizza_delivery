@@ -9,7 +9,7 @@ type OrderDelivery struct {
 	DeliveryTime int //время доставки в минутах
 }
 
-type Route []OrderDelivery
+type Route []OrderDelivery //маршрут отправки заказов
 
 //цепочка возможного подходящего маршрута
 type rawRoute struct {

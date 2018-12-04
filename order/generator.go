@@ -7,9 +7,9 @@ import (
 )
 
 var (
-	OrdersDurationRange  = [2]int{1, 30}       //диапазон возможных значений между заказами
-	CookingDurationRange = [2]int{10, 30}      //диапазон возможных значений периода приготовленяия
-	PointRange           = [2]int{-1000, 1000} //область возможных пунктов доставки
+	ordersDurationRange  = [2]int{1, 30}       //диапазон возможных значений между заказами
+	cookingDurationRange = [2]int{10, 30}      //диапазон возможных значений периода приготовленяия
+	pointRange           = [2]int{-1000, 1000} //область возможных координат доставки
 )
 
 func generatePoisson(lambda float64) int {
@@ -39,7 +39,7 @@ func getTimePeriodByPoissonDistribution(timeRange [2]int) int {
 	return v
 }
 
-func getPoint(pointRange [2]int) Point {
+func getPoint() Point {
 	return Point{
 		X: generateInRange(pointRange),
 		Y: generateInRange(pointRange),
@@ -53,10 +53,10 @@ func GenerateOrders(count int) []Order {
 	for i, _ := range orders {
 		orders[i] = Order{
 			Time:            nextOrderTime,
-			CookingDuration: getTimePeriod(CookingDurationRange),
-			DeliveryPoint:   getPoint(PointRange),
+			CookingDuration: getTimePeriod(cookingDurationRange),
+			DeliveryPoint:   getPoint(),
 		}
-		nextOrderTime += getTimePeriodByPoissonDistribution(OrdersDurationRange)
+		nextOrderTime += getTimePeriodByPoissonDistribution(ordersDurationRange)
 	}
 	return orders
 }

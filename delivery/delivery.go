@@ -6,14 +6,14 @@ import (
 )
 
 const (
-	MaxOrderCount       = 3  //Максимальное количество заказов в маршруте
-	MaxDeliveryDuration = 60 //Максимальное время доставки в минутах
-	DeliverySpeed       = 60 //Скорость доставки точек на минуту
+	maxRouteOrderCount  = 3  //максимальное количество заказов в маршруте
+	maxDeliveryDuration = 60 //максимальное время доставки в минутах
+	deliverySpeed       = 60 //скорость доставки точек на минуту
 )
 
 type Delivery struct {
-	orders       []order.Order
-	cookedOrders kitchen.CookedOrders
+	orders       []order.Order        //список заказов
+	cookedOrders kitchen.CookedOrders //список приготовления заказов
 }
 
 //вычисляет матрицу периодов доставки между пунктами доставки заказов
@@ -26,7 +26,7 @@ func (d *Delivery) calcDeliveryDurationBetweenOrderPoints(cookedOrders kitchen.C
 	for i, cookedOrder := range cookedOrders {
 		for j, cookedOrder2 := range cookedOrders[i+1:] {
 			distance := getDistance(d.orders[cookedOrder.Number].DeliveryPoint, d.orders[cookedOrder2.Number].DeliveryPoint)
-			duration := distance / DeliverySpeed
+			duration := distance / deliverySpeed
 			durations[i][i+j+1] = duration
 			durations[i+j+1][i] = duration
 		}
@@ -40,7 +40,7 @@ func (d *Delivery) getMaxDeliveryTime(cookedOrders kitchen.CookedOrders) []int {
 	times := make([]int, cookedOrderCount)
 	lastOrderCookedTime := cookedOrders[cookedOrderCount-1].Time //время приготовления последнего заказа
 	for i, order := range cookedOrders {
-		times[i] = MaxDeliveryDuration - (lastOrderCookedTime - d.orders[order.Number].Time)
+		times[i] = maxDeliveryDuration - (lastOrderCookedTime - d.orders[order.Number].Time)
 	}
 	return times
 }
@@ -49,7 +49,7 @@ func (d *Delivery) getMaxDeliveryTime(cookedOrders kitchen.CookedOrders) []int {
 func (d *Delivery) calcStartRawRoutes(cookedOrders kitchen.CookedOrders, maxDeliveryTime []int) []rawRoute {
 	routes := make([]rawRoute, 0)
 	for i, cookedOrder := range cookedOrders {
-		deliveryDuration := getDistance(order.Point{}, d.orders[cookedOrder.Number].DeliveryPoint) / DeliverySpeed
+		deliveryDuration := getDistance(order.Point{}, d.orders[cookedOrder.Number].DeliveryPoint) / deliverySpeed
 		if deliveryDuration <= maxDeliveryTime[i] {
 			r := createRawRoute(len(cookedOrders))
 			r.AddOrder(i, deliveryDuration)
@@ -66,14 +66,14 @@ func (d *Delivery) calcFitRoute(cookedOrders kitchen.CookedOrders) (bool, Route)
 	cookedOrderCount := len(cookedOrders)
 	possibleRoutes := d.calcStartRawRoutes(cookedOrders, maxDeliveryTime)
 	route := Route{}
-	routeDuration := MaxDeliveryDuration + 1
+	routeDuration := maxDeliveryDuration + 1
 	for len(possibleRoutes) > 0 {
 		rawRoute := possibleRoutes[0]                          //берем первую цепочку
 		possibleRoutes = possibleRoutes[1:]                    //удаляем первую цепочку
 		current, currentDuration, _ := rawRoute.GetLastOrder() //берем последний заказ из цепочки
 		for i := 0; i < cookedOrderCount; i++ {                //проходим по всем остальным заказам
 			if !rawRoute.IsAddedOrder(i) { //если по этому заказу не проходили в этой цепочке и не текущий заказ
-				duration := deliveryDuration[current][i] //берем период доставки от текущего заказа до следующего
+				duration := deliveryDuration[current][i]            //берем период доставки от текущего заказа до следующего
 				if currentDuration+duration <= maxDeliveryTime[i] { //если период доставки подходит
 					nextRawRoute := rawRoute.Copy()
 					nextRawRoute.AddOrder(i, duration) //добавляем заказ в цепочку
@@ -96,8 +96,8 @@ func (d *Delivery) calcFitRoute(cookedOrders kitchen.CookedOrders) (bool, Route)
 //выбираем заказы поступившие ранее времени приготовления заданного элемента
 func (d *Delivery) getFitOrdersByTime(i int) kitchen.CookedOrders {
 	maxOrderCount := len(d.cookedOrders) - i
-	if maxOrderCount > MaxOrderCount {
-		maxOrderCount = MaxOrderCount
+	if maxOrderCount > maxRouteOrderCount {
+		maxOrderCount = maxRouteOrderCount
 	}
 	for j := i + 1; j < i+maxOrderCount; j++ {
 		if d.cookedOrders[i].Time < d.orders[d.cookedOrders[j].Number].Time {
@@ -113,7 +113,7 @@ func (d *Delivery) calcMaxRoute(i int) (Route, int) {
 	for len(cookedOrders) > 0 {
 		if len(cookedOrders) == 1 { //заказ не может быть сгруппирован
 			cookedOrder := cookedOrders[0]
-			deliveryDuration := getDistance(order.Point{X: 0, Y:0}, d.orders[cookedOrder.Number].DeliveryPoint) / DeliverySpeed
+			deliveryDuration := getDistance(order.Point{X: 0, Y: 0}, d.orders[cookedOrder.Number].DeliveryPoint) / deliverySpeed
 			return Route{
 				OrderDelivery{
 					OrderNumber:  cookedOrder.Number,

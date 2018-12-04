@@ -6,12 +6,12 @@ import (
 )
 
 type Kitchen struct {
-	ovensFreeTimes []int
+	ovensFreeTimes []int //время освобождения по каждой печи
 }
 
 func (k *Kitchen) cookOrder(orderTime, cookingTime int) int {
-	sort.Ints(k.ovensFreeTimes)          // отсортировать время освобождения печей по мнимальному
-	if orderTime > k.ovensFreeTimes[0] { // если время заказа больше минимального времени освобождения печи то устанавливаем время заказа
+	sort.Ints(k.ovensFreeTimes)          //отсортировать время освобождения печей по мнимальному
+	if orderTime > k.ovensFreeTimes[0] { //если время заказа больше минимального времени освобождения печи то устанавливаем время заказа
 		k.ovensFreeTimes[0] = orderTime
 	}
 	k.ovensFreeTimes[0] += cookingTime //добавляем к времени наиболее быстроосвободившейся печи время приготовления

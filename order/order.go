@@ -1,8 +1,8 @@
 package order
 
 type Point struct {
-	X int
-	Y int
+	X int //x координата точки доставки заказа
+	Y int //y координата точки доставки заказа
 }
 
 type Order struct {
